@@ -1,20 +1,18 @@
 pipeline {
-    agent any
-    environment{
-        DOCKER_TAG = getDockerTag()
-    }
     stages{
         stage('Build Docker Image'){
             steps{
-                sh "docker build . -t saleemnmalik/nodeapp:${DOCKER_TAG} "
+                sh "docker build . -t maliknsaleem/nodeapp:${DOCKER_TAG} "
+                
             }
         }
         stage('DockerHub Push'){
             steps{
-					
+
                 withCredentials([string(credentialsId: 'docker-hub', variable: 'dockerHubPwd')]) {
-                    sh "docker login -u saleemnmalik -p ${dockerHubPwd}"
-                    sh "docker push saleemnmalik/nodeapp:${DOCKER_TAG}"
+                    sh "docker login -u maliknsaleem -p ${dockerHubPwd}"
+                    sh "docker push maliknsaleem/nodeapp:${DOCKER_TAG}"
+                    
                 }
             }
         }
@@ -22,16 +20,16 @@ pipeline {
             steps{
 							sshagent (credentials: ['tomcat-dev']) {
 							script{
-								def runCmd = "docker run -d -p 8080:8080 --name=nodeapp saleemnmalik/nodeapp:${DOCKER_TAG}"
-							    sh "ssh -o StrictHostKeyChecking=no -l ec2-user@172.31.15.240 ${runCmd}"
-							
+							sh returnStatus: true, script: 'ssh ec2-user@172.31.44.128 docker rm -f nodeapp'
+							def runCmd = "docker run -d -p 8080:8080 --name nodeapp maliknsaleem/nodeapp:${DOCKER_TAG} "
+							sh "ssh -o StrictHostKeyChecking=no ec2-user@172.31.44.128 ${runCmd} " 
 							}
 						}
             }
         }
     }
 }
+}
 def getDockerTag(){
     def tag  = sh script: 'git rev-parse HEAD', returnStdout: true
     return tag
-}
