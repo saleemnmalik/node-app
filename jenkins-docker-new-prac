@@ -23,7 +23,7 @@ pipeline {
 							sshagent (credentials: ['tomcat-dev']) {
 							script{
 								def runCmd = "docker run -d -p 8080:8080 --name=nodeapp saleemnmalik/nodeapp:${DOCKER_TAG}"
-							    sh "ssh -o StrictHostKeyChecking=no -l ec2-user@172.31.15.240 ${runCmd}"
+							    sh "ssh -o StrictHostKeyChecking=no ec2-user@172.31.15.240 ${runCmd}"
 							
 							}
 						}
