@@ -20,7 +20,10 @@ pipeline {
         }
         stage('Deploy to DevServer'){
             steps{
-							echo "Deployment to devserver" 
+							sshagent (credentials: ['deploy-dev']) {
+							def runCmd = "docker run -d -p 8080:8080 --name=nodeapp saleemnmalik/nodeapp:${DOCKER_TAG}"
+							sh "ssh -o StrictHostKeyChecking=no -l ec2-user@172.31.15.240 ${runCmd}"
+							}
 						}
             }
         }
