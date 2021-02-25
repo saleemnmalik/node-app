@@ -20,7 +20,7 @@ pipeline {
         }
         stage('Deploy to DevServer'){
             steps{
-							sshagent (credentials: ['deploy-dev']) {
+							sshagent (credentials: ['tomcat-dev']) {
 							script{
 								def runCmd = "docker run -d -p 8080:8080 --name=nodeapp saleemnmalik/nodeapp:${DOCKER_TAG}"
 							    sh "ssh -o StrictHostKeyChecking=no -l ec2-user@172.31.15.240 ${runCmd}"
@@ -29,7 +29,8 @@ pipeline {
 						}
             }
         }
-    }}
+    }
+}
 def getDockerTag(){
     def tag  = sh script: 'git rev-parse HEAD', returnStdout: true
     return tag
